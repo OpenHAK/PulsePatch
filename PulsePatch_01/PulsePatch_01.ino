@@ -10,6 +10,8 @@
 //This line added by Chip 2016-09-28 to enable plotting by Arduino Serial Plotter
 const int PRINT_ONLY_FOR_PLOTTER = 1;  //Set this to zero to return normal verbose print() statements
 
+const byte ledEnable = 9;
+
 unsigned int LED_timer;
 int LED_delayTime = 300;
 boolean boardLEDstate = HIGH;
@@ -29,12 +31,13 @@ int rAmp = 10;
 int irAmp = 10;
 
 
+
 //  TESTING
 unsigned int thisTestTime;
 unsigned int thatTestTime;
 
 char sampleRate;
-boolean useFilter = false;
+boolean useFilter = true;
 int gain = 10;
 float HPfilterInputRED[NUM_SAMPLES];
 float HPfilterOutputRED[NUM_SAMPLES];
@@ -51,6 +54,7 @@ void setup(){
   Serial.begin(230400);
   pinMode(BOARD_LED,OUTPUT); digitalWrite(BOARD_LED, boardLEDstate);
   pinMode(MAX_INT,INPUT);
+  pinMode(ledEnable,OUTPUT);
 
   attachPinInterrupt(MAX_INT,MAX_ISR,LOW);
   if (!PRINT_ONLY_FOR_PLOTTER) Serial.println("\nPulsePatch 01\n");

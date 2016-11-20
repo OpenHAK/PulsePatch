@@ -4,8 +4,8 @@
 */
 
 //  SIMBLEE PINS
-#define BOARD_LED 12  // on board LED
-#define MAX_INT 25    // MAX30102 interrupts on this Simblee pin
+#define BOARD_LED 25  // on board LED
+#define MAX_INT 30    // MAX30102 interrupts on this Simblee pin
 #define SCL_PIN 13
 #define SDA_PIN 10
 
@@ -73,6 +73,6 @@
 #define TEMP_EN 0x01
 
 // filter stuff
-#define CUTTOFF_LOW 0.5
+#define CUTTOFF_LOW 5.5
 #define CUTTOFF_HIGH 10.0
-#define NUM_SAMPLES 10
+#define NUM_SAMPLES 50

@@ -34,6 +34,8 @@ void enableMAX30102(boolean activate){
   zeroFIFOpointers();
   if(!activate){ setting |= 0x80; }
   MAX30102_writeRegister(MODE_CONFIG,setting);
+  delay(100);
+  digitalWrite(ledEnable,activate); // ENABLES MAX LED OUTPUT, use this to force the LED off for power saving
 }
 
 void zeroFIFOpointers(){
@@ -61,7 +63,7 @@ void serviceInterrupts(){
 //      Serial.println("PPG_RDY");
 //      readPointers();
       readPPG();  // read the light sensor data that is available
-      serialPPG(); // send the RED and/or IR data 
+      serialPPG(); // send the RED and/or IR data
     }else if((interruptFlags & (ALC_OVF<<8)) > 0){ // Ambient Light Cancellation Overflow
       Serial.println("ALC_OVF");
     }else if((interruptFlags & TEMP_RDY) > 0){  // Temperature Conversion Available
@@ -117,8 +119,9 @@ void serialPPG(){
     Serial.print(IRvalue);
   } else {
     if(useFilter){
-      Serial.print(HPfilterOutputRED[NUM_SAMPLES-1]); printSpace(); 
-      Serial.print(HPfilterOutputIR[NUM_SAMPLES-1]);
+      Serial.print(HPfilterOutputRED[NUM_SAMPLES-1]); printSpace();
+      Serial.print(HPfilterOutputIR[NUM_SAMPLES-1]); printSpace();
+      Serial.print(HPfilterOutputIR[NUM_SAMPLES-1]+HPfilterOutputRED[NUM_SAMPLES-1]);
     } else {
       Serial.print(REDvalue); printSpace();
       Serial.print(IRvalue);
@@ -147,19 +150,19 @@ void readFIFOdata(){
   REDvalue = 0; IRvalue = 0;
 //  REDvalue = (dataByte[0] << 16) | (dataByte[1] << 8) | dataByte[2];
 //  IRvalue = (dataByte[3] << 16) | (dataByte[4] << 8) | dataByte[5];
-  
-  REDvalue = (dataByte[0] & 0xFF); REDvalue <<= 8; 
+
+  REDvalue = (dataByte[0] & 0xFF); REDvalue <<= 8;
   REDvalue |= dataByte[1]; REDvalue <<= 8;
   REDvalue |= dataByte[2];
-  IRvalue = (dataByte[3] & 0xFF); IRvalue <<= 8; 
+  IRvalue = (dataByte[3] & 0xFF); IRvalue <<= 8;
   IRvalue |= dataByte[4]; IRvalue <<= 8;
-  IRvalue |= dataByte[5]; 
-  
+  IRvalue |= dataByte[5];
+
   REDvalue &= 0x0003FFFF; IRvalue &= 0x0003FFFF;
 //  REDvalue >>= 3; IRvalue >>= 3;
 //  REDvalue &= 0x0003FFF8; IRvalue &= 0x0003FFF8;
   if(useFilter){
-    filterHP(REDvalue, IRvalue);
+    runFilters(REDvalue, IRvalue);
   }
 }
 
